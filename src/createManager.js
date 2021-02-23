@@ -1,7 +1,7 @@
 import EventEmitter from "eventemitter3";
-import {debounce, throttle} from "throttle-debounce";
+import { debounce, throttle } from "throttle-debounce";
 import invariant from "invariant";
-import {canUseDOM} from "exenv";
+import { canUseDOM } from "exenv";
 import Events from "./Events";
 import isInViewport from "./utils/isInViewport";
 
@@ -27,7 +27,7 @@ export const pubadsAPI = [
     "setTagForChildDirectedTreatment",
     "clearTagForChildDirectedTreatment",
     "setVideoContent",
-    "setForceSafeFrame"
+    "setForceSafeFrame",
 ];
 
 export const APIToCallBeforeServiceEnabled = [
@@ -36,7 +36,7 @@ export const APIToCallBeforeServiceEnabled = [
     "enableSyncRendering",
     "disableInitialLoad",
     "collapseEmptyDivs",
-    "setCentering"
+    "setCentering",
 ];
 
 export class AdManager extends EventEmitter {
@@ -84,7 +84,7 @@ export class AdManager extends EventEmitter {
         if (process.env.NODE_ENV === "production") {
             return;
         }
-        const {test, GPTMock} = config;
+        const { test, GPTMock } = config;
         this._isLoaded = true;
         this._testMode = !!test;
 
@@ -99,14 +99,14 @@ export class AdManager extends EventEmitter {
 
     _processPubadsQueue() {
         if (this._pubadsProxyQueue) {
-            Object.keys(this._pubadsProxyQueue).forEach(method => {
+            Object.keys(this._pubadsProxyQueue).forEach((method) => {
                 if (
                     (this.googletag &&
                         !this.googletag.pubadsReady &&
                         APIToCallBeforeServiceEnabled.indexOf(method) > -1) ||
                     this.pubadsReady
                 ) {
-                    this._pubadsProxyQueue[method].forEach(params =>
+                    this._pubadsProxyQueue[method].forEach((params) =>
                         this.pubadsProxy(params)
                     );
                     delete this._pubadsProxyQueue[method];
@@ -118,7 +118,7 @@ export class AdManager extends EventEmitter {
         }
     }
 
-    _callPubads({method, args, resolve, reject}) {
+    _callPubads({ method, args, resolve, reject }) {
         if (typeof this.googletag.pubads()[method] !== "function") {
             reject(
                 new Error(
@@ -136,7 +136,7 @@ export class AdManager extends EventEmitter {
     }
 
     _toggleListener(add) {
-        ["scroll", "resize"].forEach(eventName => {
+        ["scroll", "resize"].forEach((eventName) => {
             window[add ? "addEventListener" : "removeEventListener"](
                 eventName,
                 this._foldCheck
@@ -144,9 +144,9 @@ export class AdManager extends EventEmitter {
         });
     }
 
-    _foldCheck = throttle(20, event => {
+    _foldCheck = throttle(20, (event) => {
         const instances = this.getMountedInstances();
-        instances.forEach(instance => {
+        instances.forEach((instance) => {
             if (instance.getRenderWhenViewable()) {
                 instance.foldCheck(event);
             }
@@ -161,7 +161,7 @@ export class AdManager extends EventEmitter {
         return Date.now();
     }
 
-    _handleMediaQueryChange = event => {
+    _handleMediaQueryChange = (event) => {
         if (this._syncCorrelator) {
             this.refresh();
             return;
@@ -172,7 +172,7 @@ export class AdManager extends EventEmitter {
         const viewportWidth = res && res[1];
 
         if (viewportWidth && this._mqls[viewportWidth]) {
-            this._mqls[viewportWidth].listeners.forEach(instance => {
+            this._mqls[viewportWidth].listeners.forEach((instance) => {
                 instance.refresh();
                 if (instance.props.onMediaQueryChange) {
                     instance.props.onMediaQueryChange(event);
@@ -187,9 +187,9 @@ export class AdManager extends EventEmitter {
                 Events.SLOT_RENDER_ENDED,
                 Events.IMPRESSION_VIEWABLE,
                 Events.SLOT_VISIBILITY_CHANGED,
-                Events.SLOT_LOADED
-            ].forEach(eventType => {
-                ["pubads", "content", "companionAds"].forEach(service => {
+                Events.SLOT_LOADED,
+            ].forEach((eventType) => {
+                ["pubads", "content", "companionAds"].forEach((service) => {
                     // there is no API to remove listeners.
                     this.googletag[service]().addEventListener(
                         eventType,
@@ -208,11 +208,11 @@ export class AdManager extends EventEmitter {
         }
         // call event handler props
         const instances = this.getMountedInstances();
-        const {slot} = event;
+        const { slot } = event;
         const funcName = `on${eventType
             .charAt(0)
             .toUpperCase()}${eventType.substr(1)}`;
-        const instance = instances.filter(inst => slot === inst.adSlot)[0];
+        const instance = instances.filter((inst) => slot === inst.adSlot)[0];
         if (instance && instance.props[funcName]) {
             instance.props[funcName](event);
         }
@@ -259,12 +259,12 @@ export class AdManager extends EventEmitter {
         }
     }
 
-    addMQListener(instance, {sizeMapping}) {
+    addMQListener(instance, { sizeMapping }) {
         if (!sizeMapping || !Array.isArray(sizeMapping)) {
             return;
         }
 
-        sizeMapping.forEach(size => {
+        sizeMapping.forEach((size) => {
             const viewportWidth = size.viewport && size.viewport[0];
             if (viewportWidth !== undefined) {
                 if (!this._mqls) {
@@ -277,7 +277,7 @@ export class AdManager extends EventEmitter {
                     mql.addListener(this._handleMediaQueryChange);
                     this._mqls[viewportWidth] = {
                         mql,
-                        listeners: []
+                        listeners: [],
                     };
                 }
                 if (
@@ -294,7 +294,7 @@ export class AdManager extends EventEmitter {
             return;
         }
 
-        Object.keys(this._mqls).forEach(key => {
+        Object.keys(this._mqls).forEach((key) => {
             const index = this._mqls[key].listeners.indexOf(instance);
             if (index > -1) {
                 this._mqls[key].listeners.splice(index, 1);
@@ -345,7 +345,7 @@ export class AdManager extends EventEmitter {
             return;
         }
 
-        const checkPubadsReady = cb => {
+        const checkPubadsReady = (cb) => {
             if (this.pubadsReady) {
                 cb();
             } else {
@@ -358,7 +358,7 @@ export class AdManager extends EventEmitter {
         let dummyAdSlot;
 
         // Define all the slots
-        instances.forEach(instance => {
+        instances.forEach((instance) => {
             if (!instance.notInViewport()) {
                 instance.defineSlot();
                 const adSlot = instance.adSlot;
@@ -368,7 +368,7 @@ export class AdManager extends EventEmitter {
                     if (!hasPubAdsService) {
                         hasPubAdsService =
                             services.filter(
-                                service => !!service.enableAsyncRendering
+                                (service) => !!service.enableAsyncRendering
                             ).length > 0;
                     }
                 }
@@ -401,7 +401,7 @@ export class AdManager extends EventEmitter {
             this.emit(Events.READY, this.googletag);
 
             // Call display
-            instances.forEach(instance => {
+            instances.forEach((instance) => {
                 if (!instance.notInViewport()) {
                     instance.display();
                 }
@@ -492,20 +492,22 @@ export class AdManager extends EventEmitter {
                 if (window.googletag && window.googletag.apiReady) {
                     onLoad();
                 } else {
-                    const script = document.createElement("script");
-                    script.async = true;
-                    script.onload = onLoad;
-                    script.onerror = () => {
-                        reject(new Error("failed to load script"));
-                    };
-                    script.src = url;
-                    document.head.appendChild(script);
+                    setTimeout(() => {
+                        const script = document.createElement("script");
+                        script.async = true;
+                        script.onload = onLoad;
+                        script.onerror = () => {
+                            reject(new Error("failed to load script"));
+                        };
+                        script.src = url;
+                        document.head.appendChild(script);
+                    }, 500);
                 }
             }))
         );
     }
 
-    pubadsProxy({method, args = [], resolve, reject}) {
+    pubadsProxy({ method, args = [], resolve, reject }) {
         if (!resolve) {
             // there are couple pubads API which doesn't provide getter methods for later use,
             // so remember them here.
@@ -517,7 +519,7 @@ export class AdManager extends EventEmitter {
                     method,
                     args,
                     resolve: resolve2,
-                    reject: reject2
+                    reject: reject2,
                 };
                 if (!this.pubadsReady) {
                     if (!this._pubadsProxyQueue) {
@@ -533,7 +535,7 @@ export class AdManager extends EventEmitter {
             });
         }
 
-        this._callPubads({method, args, resolve, reject});
+        this._callPubads({ method, args, resolve, reject });
 
         return Promise.resolve();
     }
