@@ -29,6 +29,8 @@ var _isInViewport3 = _interopRequireDefault(_isInViewport2);
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
+function _asyncToGenerator(fn) { return function () { var gen = fn.apply(this, arguments); return new Promise(function (resolve, reject) { function step(key, arg) { try { var info = gen[key](arg); var value = info.value; } catch (error) { reject(error); return; } if (info.done) { resolve(value); } else { return Promise.resolve(value).then(function (value) { step("next", value); }, function (err) { step("throw", err); }); } } return step("next"); }); }; }
+
 function _toConsumableArray(arr) { if (Array.isArray(arr)) { for (var i = 0, arr2 = Array(arr.length); i < arr.length; i++) { arr2[i] = arr[i]; } return arr2; } else { return Array.from(arr); } }
 
 function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
@@ -477,29 +479,42 @@ var AdManager = exports.AdManager = function (_EventEmitter) {
                 if (window.googletag && window.googletag.apiReady) {
                     onLoad();
                 } else {
-                    setTimeout(function () {
-                        var script = document.createElement("script");
-                        script.async = true;
-                        script.onload = onLoad;
-                        script.onerror = function () {
-                            reject(new Error("failed to load script"));
-                        };
-                        script.src = url;
-                        document.head.appendChild(script);
-                    }, 500);
+                    window.addEventListener("load", _asyncToGenerator(regeneratorRuntime.mark(function _callee() {
+                        return regeneratorRuntime.wrap(function _callee$(_context) {
+                            while (1) {
+                                switch (_context.prev = _context.next) {
+                                    case 0:
+                                        setTimeout(function () {
+                                            var script = document.createElement("script");
+                                            script.async = true;
+                                            script.onload = onLoad;
+                                            script.onerror = function () {
+                                                reject(new Error("failed to load script"));
+                                            };
+                                            script.src = url;
+                                            document.head.appendChild(script);
+                                        }, 500);
+
+                                    case 1:
+                                    case "end":
+                                        return _context.stop();
+                                }
+                            }
+                        }, _callee, _this7);
+                    })), { once: true });
                 }
             }));
         }
     }, {
         key: "pubadsProxy",
-        value: function pubadsProxy(_ref3) {
+        value: function pubadsProxy(_ref4) {
             var _this8 = this;
 
-            var method = _ref3.method,
-                _ref3$args = _ref3.args,
-                args = _ref3$args === undefined ? [] : _ref3$args,
-                resolve = _ref3.resolve,
-                reject = _ref3.reject;
+            var method = _ref4.method,
+                _ref4$args = _ref4.args,
+                args = _ref4$args === undefined ? [] : _ref4$args,
+                resolve = _ref4.resolve,
+                reject = _ref4.reject;
 
             if (!resolve) {
                 // there are couple pubads API which doesn't provide getter methods for later use,
