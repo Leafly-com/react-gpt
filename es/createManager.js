@@ -486,14 +486,14 @@ var AdManager = exports.AdManager = function (_EventEmitter) {
                                     case 0:
                                         setTimeout(function () {
                                             var script = document.createElement("script");
-                                            script.async = true;
+                                            script.defer = true;
                                             script.onload = onLoad;
                                             script.onerror = function () {
                                                 reject(new Error("failed to load script"));
                                             };
                                             script.src = url;
                                             document.head.appendChild(script);
-                                        }, 500);
+                                        }, 250);
 
                                     case 1:
                                     case "end":

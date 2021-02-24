@@ -497,14 +497,14 @@ export class AdManager extends EventEmitter {
                         async () => {
                             setTimeout(() => {
                                 const script = document.createElement("script");
-                                script.async = true;
+                                script.defer = true;
                                 script.onload = onLoad;
                                 script.onerror = () => {
                                     reject(new Error("failed to load script"));
                                 };
                                 script.src = url;
                                 document.head.appendChild(script);
-                            }, 500);
+                            }, 250);
                         },
                         {once: true}
                     );
